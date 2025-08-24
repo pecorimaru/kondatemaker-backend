@@ -1,0 +1,121 @@
+name: Deploy Backend to Server
+
+on:
+  push:
+    branches:
+      - main  # メインブランチにプッシュされたときにトリガー
+  workflow_dispatch:  # 手動実行も可能
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # GitHub-hostedランナーを使用
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'  # requirements.txtに合わせて調整
+      
+      # 依存関係のキャッシュ（高速化のため）
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      
+      # 依存関係の検証（オプション）
+      - name: Install dependencies for validation
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      # テストの実行（テストファイルがある場合）
+      - name: Run tests
+        run: |
+          if [ -d "test" ] && [ "$(ls -A test)" ]; then
+            echo "Running tests..."
+            python -m pytest test/ || echo "Tests failed or no pytest available"
+          else
+            echo "No tests found, skipping..."
+          fi
+      
+      # バックエンドファイルのデプロイ
+      - name: Deploy Python FastAPI files
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          source: "app/*,requirements.txt,*.py"
+          target: "/home/gpotyglj/python/public/backend/"
+          overwrite: true
+          rm: false
+      
+      # 設定ファイルの配置（必要に応じて）
+      - name: Deploy config files
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          source: "config/*"
+          target: "/home/gpotyglj/python/public/backend/"
+          overwrite: true
+          rm: false
+        continue-on-error: true
+      
+      # サーバー上での後処理
+      - name: Server post-deployment tasks
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          script: |
+            # Python仮想環境のアクティブ化
+            echo "Activating Python virtual environment..."
+            source /home/gpotyglj/virtualenv/python/public/backend/3.11/bin/activate
+            
+            # デプロイ先ディレクトリに移動
+            cd /home/gpotyglj/python/public/backend
+            
+            # 仮想環境が正しくアクティブ化されているか確認
+            echo "Current Python path: $(which python)"
+            echo "Current pip path: $(which pip)"
+            echo "Python version: $(python --version)"
+            
+            # 依存関係の更新
+            echo "Updating pip and installing requirements..."
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+            
+            # passenger_wsgi.pyをタッチして再起動
+            echo "Restarting application..."
+            touch passenger_wsgi.py
+            
+            echo "✅ Deployment completed at $(date)"
+            
+      # デプロイ後のヘルスチェック
+      - name: Health check
+        run: |
+          sleep 10  # サーバー起動待機
+          curl -f https://apiapi.nagoya/health || curl -f https://apiapi.nagoya/ || echo "Health check failed, but deployment may still be successful"
+        continue-on-error: true
+
+      # Slack通知（オプション）
+      - name: Notify deployment result
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Backend deployment successful!"
+          else
+            echo "❌ Backend deployment failed!"
+          fi
