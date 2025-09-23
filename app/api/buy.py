@@ -1,71 +1,45 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from typing import Optional
-
 from app.core.session import get_db, oauth2_scheme
 from app.crud import AppConstCrud
-from app.utils.api_utils import CamelModel, decode_token
+from app.utils.api_utils import decode_token
 from app.models.display import BuyIngredDisp
 from app.services import BuyService
 from app.utils import message_utils as msg, constants as const
-
+from app.types.api.buy import (
+    SwitchCompletionStateRequest,
+    SwitchCompletionStateResponse,
+    SubmitAddBuyIngredRequest,
+    SubmitAddBuyIngredResponse,
+    SubmitEditBuyIngredRequest,
+    SubmitEditBuyIngredResponse,
+    SubmitDeleteBuyIngredResponse,
+)
 
 router = APIRouter()
 
 
-class SwitchCompletionStateRequest(CamelModel):
-    buy_ingred_id: int
-    bought_flg: str
-
-class SwitchCompletionStateResponse(CamelModel):
-    status_code: int
-    message: Optional[str]=None
-    new_buy_ingred: BuyIngredDisp
-
-class SubmitAddBuyIngredRequest(CamelModel):
-    ingred_nm: str
-    qty: Optional[float]=None
-    unit_cd: str
-    sales_area_type: str
-    is_buy_every_week: bool
-
-class SubmitAddBuyIngredResponse(CamelModel):
-    status_code: int
-    message: Optional[str]=None
-    new_buy_ingred: BuyIngredDisp
-
-class SubmitEditBuyIngredRequest(CamelModel):
-    buy_ingred_id: int
-    ingred_nm: str
-    qty: Optional[float]=None
-    unit_cd: str
-    sales_area_type: str
-    is_buy_every_week: bool
-
-class SubmitEditBuyIngredResponse(CamelModel):
-    status_code: int
-    message: Optional[str]=None
-    new_buy_ingred: BuyIngredDisp
-
-class SubmitDeleteBuyIngredResponse(CamelModel):
-    status_code: int
-    message: Optional[str]=None
-
-
 @router.get("/buyIngredList")
-def fetch_buy_ingred_list(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)) -> list[BuyIngredDisp]:
-    login_info = decode_token(token)
+def fetch_buy_ingred_list(
+    db: Session = Depends(get_db), 
+    token: str = Depends(oauth2_scheme)
+) -> list[BuyIngredDisp]:
 
+    login_info = decode_token(token)
     buy_service = BuyService(login_info.user_id, login_info.group_id, login_info.owner_user_id, db)
     buy_ingred_list = buy_service.fetch_buy_ingred_list()
     return buy_ingred_list
 
 
 @router.put("/submitSwitchCompletion", response_model=SwitchCompletionStateResponse)
-def submit_switch_completion_state(request: SwitchCompletionStateRequest, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    login_info = decode_token(token)
+def submit_switch_completion_state(
+    request: SwitchCompletionStateRequest, 
+    db: Session = Depends(get_db), 
+    token: str = Depends(oauth2_scheme)
+):
 
+    login_info = decode_token(token)
     buy_service = BuyService(login_info.user_id, login_info.group_id, login_info.owner_user_id, db)
     new_buy_ingred = buy_service.switch_completion_state(request.buy_ingred_id, request.bought_flg)
     return SwitchCompletionStateResponse(
@@ -76,20 +50,28 @@ def submit_switch_completion_state(request: SwitchCompletionStateRequest, db: Se
 
 
 @router.post("/submitAddBuyIngred", response_model=SubmitAddBuyIngredResponse)
-def submit_add_buy_ingred(request: SubmitAddBuyIngredRequest, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    login_info = decode_token(token)
+def submit_add_buy_ingred(
+    request: SubmitAddBuyIngredRequest, 
+    db: Session = Depends(get_db), 
+    token: str = Depends(oauth2_scheme)
+):
 
+    login_info = decode_token(token)
     buy_service = BuyService(login_info.user_id, login_info.group_id, login_info.owner_user_id, db)
     new_buy_ingred = buy_service.add_buy_ingred(
-        request.ingred_nm, 
-        request.qty, 
-        request.unit_cd, 
-        request.sales_area_type, 
+        request.ingred_nm,
+        request.qty,
+        request.unit_cd,
+        request.sales_area_type,
         request.is_buy_every_week
     )
 
     app_const_crud = AppConstCrud(db)
-    app_const = app_const_crud.get_app_const_from_val(const.APP_CONST_C0002_UNIT_TYPE, new_buy_ingred.unit_cd)
+    app_const = app_const_crud.get_app_const_from_val(
+        const.APP_CONST_C0002_UNIT_TYPE,
+        new_buy_ingred.unit_cd
+    )
+
     qty_disp = str(f"{new_buy_ingred.qty:.15g}") + app_const.val_content if new_buy_ingred.qty else ""
 
     return SubmitAddBuyIngredResponse(
@@ -100,16 +82,20 @@ def submit_add_buy_ingred(request: SubmitAddBuyIngredRequest, db: Session = Depe
 
 
 @router.put("/submitEditBuyIngred", response_model=SubmitEditBuyIngredResponse)
-def submit_edit_buy_ingred(request: SubmitEditBuyIngredRequest, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    login_info = decode_token(token)
+def submit_edit_buy_ingred(
+    request: SubmitEditBuyIngredRequest, 
+    db: Session = Depends(get_db), 
+    token: str = Depends(oauth2_scheme)
+):
 
+    login_info = decode_token(token)
     buy_service = BuyService(login_info.user_id, login_info.group_id, login_info.owner_user_id, db)
     new_buy_ingred = buy_service.edit_buy_ingred(
-        request.buy_ingred_id, 
-        request.ingred_nm, 
-        request.qty, 
-        request.unit_cd, 
-        request.sales_area_type, 
+        request.buy_ingred_id,
+        request.ingred_nm,
+        request.qty,
+        request.unit_cd,
+        request.sales_area_type,
         request.is_buy_every_week
     )
 
@@ -121,9 +107,13 @@ def submit_edit_buy_ingred(request: SubmitEditBuyIngredRequest, db: Session = De
 
 
 @router.delete("/submitDeleteBuyIngred/{query_params}", response_model=SubmitDeleteBuyIngredResponse)
-def submit_delete_buy_ingred(buy_ingred_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    login_info = decode_token(token)
+def submit_delete_buy_ingred(
+    buy_ingred_id: int, 
+    db: Session = Depends(get_db), 
+    token: str = Depends(oauth2_scheme)
+):
 
+    login_info = decode_token(token)
     buy_service = BuyService(login_info.user_id, login_info.group_id, login_info.owner_user_id, db)
     buy_service.delete_buy_ingred(buy_ingred_id)
     return SubmitDeleteBuyIngredResponse(
