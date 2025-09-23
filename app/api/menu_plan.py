@@ -1,64 +1,24 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from typing import Optional
-
 from app.core.session import get_db, oauth2_scheme
-from app.utils.api_utils import CamelModel, decode_token
-from app.models.display import MenuPlanDisp, MenuPlanDetDisp
+from app.utils.api_utils import decode_token
 from app.services import MenuPlanService
 from app.utils import message_utils as msg
-
+from app.types.api.menu_plan import (
+    SubmitAddMenuPlanRequest,
+    SubmitAddMenuPlanResponse,
+    SubmitEditMenuPlanRequest,
+    SubmitEditMenuPlanResponse,
+    SubmitDeleteMenuPlanResponse,
+    SubmitAddMenuPlanDetRequest,
+    SubmitAddMenuPlanDetResponse,
+    SubmitEditMenuPlanDetRequest,
+    SubmitEditMenuPlanDetResponse,
+    SubmitDeleteMenuPlanDetResponse,
+)
 
 router = APIRouter()
-
-
-class SubmitAddMenuPlanRequest(CamelModel):
-    menu_plan_nm: str
-    menu_plan_nm_k: str
-
-class SubmitAddMenuPlanResponse(CamelModel):
-    status_code: int
-    message: Optional[str]=None
-    new_menu_plan: MenuPlanDisp
-
-class SubmitEditMenuPlanRequest(CamelModel):
-    menu_plan_id: int
-    menu_plan_nm: str
-    menu_plan_nm_k: str
-
-class SubmitEditMenuPlanResponse(CamelModel):
-    status_code: int
-    message: Optional[str]=None
-    new_menu_plan: MenuPlanDisp
-
-class SubmitDeleteMenuPlanResponse(CamelModel):
-    status_code: int
-    message: Optional[str]=None
-
-class SubmitAddMenuPlanDetRequest(CamelModel):
-    menu_plan_id: int
-    weekday_cd: str
-    recipe_nm: str 
-
-class SubmitAddMenuPlanDetResponse(CamelModel):
-    status_code: int
-    message: Optional[str]=None
-    new_menu_plan_det: MenuPlanDetDisp
-
-class SubmitEditMenuPlanDetRequest(CamelModel):
-    menu_plan_det_id: int
-    weekday_cd: str
-    recipe_nm: str 
-
-class SubmitEditMenuPlanDetResponse(CamelModel):
-    status_code: int
-    message: Optional[str]=None
-    new_menu_plan_det: MenuPlanDetDisp
-
-class SubmitDeleteMenuPlanDetResponse(CamelModel):
-    status_code: int
-    message: Optional[str]=None
 
 
 @router.get("/menuPlanList")
@@ -134,7 +94,7 @@ async def submit_add_menu_plan_det(request: SubmitAddMenuPlanDetRequest, db: Ses
     )
 
 @router.put("/submitEditMenuPlanDet", response_model=SubmitEditMenuPlanDetResponse)
-async def submit_edit_menu_plan(request: SubmitEditMenuPlanDetRequest, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+async def submit_edit_menu_plan_det(request: SubmitEditMenuPlanDetRequest, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     login_info = decode_token(token)
 
     menu_plan_service = MenuPlanService(login_info.user_id, login_info.group_id, login_info.owner_user_id, db)
@@ -153,7 +113,7 @@ async def submit_delete_menu_plan_det(menu_plan_det_id: int, db: Session = Depen
     menu_plan_service = MenuPlanService(login_info.user_id, login_info.group_id, login_info.owner_user_id, db)
     menu_plan_service.delete_menu_plan_det(menu_plan_det_id)
 
-    return SubmitDeleteMenuPlanResponse(
+    return SubmitDeleteMenuPlanDetResponse(
         status_code = 200,
         message = msg.get_message(msg.MI0008_DELETE_SUCCESSFUL),
     )

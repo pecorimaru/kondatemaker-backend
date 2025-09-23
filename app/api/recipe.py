@@ -1,74 +1,24 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from typing import Optional
-
 from app.core.session import get_db, oauth2_scheme
-from app.utils.api_utils import CamelModel
-from app.models.display import RecipeDisp, RecipeIngredDisp
-from app.services import RecipeService
 from app.utils.api_utils import decode_token
+from app.services import RecipeService
 from app.utils import message_utils as msg
-
+from app.types.api.recipe import (
+    SubmitAddRecipeRequest,
+    SubmitAddRecipeResponse,
+    SubmitEditRecipeRequest,
+    SubmitEditRecipeResponse,
+    SubmitDeleteRecipeResponse,
+    SubmitAddRecipeIngredRequest,
+    SubmitAddRecipeIngredResponse,
+    SubmitUpdateRecipeIngredRequest,
+    SubmitUpdateRecipeIngredResponse,
+    SubmitDeleteRecipeIngredResponse,
+)
 
 router = APIRouter()
-
-
-class SubmitAddRecipeRequest(CamelModel):
-    recipe_nm: str
-    recipe_nm_k: Optional[str]=None
-    recipe_type: str
-    recipe_url: Optional[str]=None
-
-class SubmitAddRecipeResponse(CamelModel):
-    status_code: int
-    message: Optional[str]=None
-    new_recipe: RecipeDisp
-
-class SubmitEditRecipeRequest(CamelModel):
-    recipe_id: int
-    recipe_nm: str
-    recipe_nm_k: Optional[str]=None
-    recipe_type: str
-    recipe_url: Optional[str]=None
-
-class SubmitEditRecipeResponse(CamelModel):
-    status_code: int
-    message: Optional[str]=None
-    new_recipe: RecipeDisp
-
-class SubmitDeleteRecipeResponse(CamelModel):
-    status_code: int
-    message: Optional[str]=None
-
-class SubmitAddRecipeIngredRequest(CamelModel):
-    recipe_id: int
-    ingred_nm: str
-    qty: float
-    unit_cd: str
-
-class SubmitAddRecipeIngredResponse(CamelModel):
-    status_code: int
-    message: Optional[str]=None
-    new_recipe_ingred: RecipeIngredDisp
-
-class SubmitUpdateRecipeIngredRequest(CamelModel):
-    recipe_ingred_id: int
-    ingred_nm: str
-    qty: float
-    unit_cd: str
-
-class SubmitUpdateRecipeIngredResponse(CamelModel):
-    status_code: int
-    message: Optional[str]=None
-    new_recipe_ingred: RecipeIngredDisp
-
-class SubmitDeleteRecipeIngredRequest(CamelModel):
-    recipe_ingred_id: int
-
-class SubmitDeleteRecipeIngredResponse(CamelModel):
-    status_code: int
-    message: Optional[str]=None
 
 
 @router.get("/recipeList")
@@ -146,7 +96,7 @@ async def submit_edit_recipe_ingred(request: SubmitUpdateRecipeIngredRequest, db
 
     recipe_service = RecipeService(login_info.user_id, login_info.group_id, login_info.owner_user_id, db)
     new_recipe_ingred = recipe_service.edit_recipe_ingred(request.recipe_ingred_id, request.ingred_nm, request.qty, request.unit_cd)
-    return SubmitAddRecipeIngredResponse(
+    return SubmitUpdateRecipeIngredResponse(
         status_code = status.HTTP_200_OK,
         message = msg.get_message(msg.MI0003_EDIT_SUCCESSFUL),
         new_recipe_ingred = new_recipe_ingred,

@@ -1,61 +1,25 @@
 from fastapi import APIRouter, Depends, Request, Response, status
 from sqlalchemy.orm import Session
 
-from typing import Optional
-
 from app.core.session import get_db
-from app.utils.api_utils import CamelModel, decode_token
+from app.utils.api_utils import decode_token
 from app.services import LoginService
-from app.utils import message_utils as msg 
-
+from app.utils import message_utils as msg
+from app.types.api.login import (
+    LoginRequest,
+    LoginResponse,
+    VerifyRequest,
+    VerifyResponse,
+    RefreshResponse,
+    ResetPasswordRequest,
+    ResetPasswordResponse,
+    CreateUserRequest,
+    CreateUserResponse,
+    ActivateRequest,
+    ActivateResponse,
+)
 
 router = APIRouter()
-
-
-class LoginRequest(CamelModel):
-    email: str
-    password: Optional[str]=None
-
-class LoginResponse(CamelModel):
-    status_code: int
-    message: str
-    user_nm: Optional[str]=None
-    access_token: Optional[str]=None
-
-class VerifyRequest(CamelModel):
-    token: str
-
-class VerifyResponse(CamelModel):
-    status_code: int
-
-class RefreshRequest(CamelModel):
-    refresh_token: str
-
-class RefreshResponse(CamelModel):
-    status_code: int
-    new_access_token: str
-
-class ResetPasswordRequest(CamelModel):
-    email: str
-
-class ResetPasswordResponse(CamelModel):
-    status_code: int
-    message: str
-
-class CreateUserRequest(CamelModel):
-    email: str
-    password: str
-
-class CreateUserResponse(CamelModel):
-    status_code: int
-    message: str
-
-class ActivateRequest(CamelModel):
-    token: str
-
-class ActivateResponse(CamelModel):
-    status_code: int
-    message: str
 
 
 @router.post("/login", response_model=LoginResponse)
@@ -116,12 +80,12 @@ def verify(request: VerifyRequest):
 
 
 @router.post("/refresh", response_model=RefreshResponse)
-def refresh_token(request: Request, db: Session = Depends(get_db)):
+def refresh_access_token(request: Request, db: Session = Depends(get_db)):
 
-    refresh_token = request.cookies.get("refresh_token")
+    token_from_cookie = request.cookies.get("refresh_token")
 
     login_service = LoginService(None, None, None, db)
-    new_access_token = login_service.refresh_access_token(refresh_token)
+    new_access_token = login_service.refresh_access_token(token_from_cookie)
 
     return RefreshResponse(
         status_code = status.HTTP_200_OK,

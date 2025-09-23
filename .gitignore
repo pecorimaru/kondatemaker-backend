@@ -226,3 +226,6 @@ tests/
 
 # Additional cache directories
 **/__pycache__/
+
+.devcontainer/
+.pylintrc
