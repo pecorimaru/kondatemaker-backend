@@ -174,6 +174,7 @@ class GroupCrud(BaseService):
                 group_id = group_id,
                 user_id = user_id,
                 config_type = config_type,
+                config_type_nm = get_group_config_type_nm(config_type),
                 val = val,
                 crt_timestamp = time_stamp,
                 crt_user_id = self.user_id,
@@ -249,3 +250,14 @@ class GroupCrud(BaseService):
         except SQLAlchemyError as e:
             method_nm = self.get_method_nm()
             self.handle_system_error(e, method_nm, self.get_params(method_nm))
+
+
+
+def get_group_config_type_nm(config_type: str) -> str:
+
+    if config_type == const.GROUP_CONFIG_TYPE_JOIN_FLG:
+        return const.GROUP_CONFIG_TYPE_NM_JOIN_FLG
+    elif config_type == const.GROUP_CONFIG_TYPE_INVITE_TOKEN:
+        return const.GROUP_CONFIG_TYPE_NM_INVITE_TOKEN
+    else:
+        return ""

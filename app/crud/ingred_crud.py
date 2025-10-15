@@ -81,7 +81,7 @@ class IngredCrud(BaseService):
                 new_ingred = Ingred(
                     ingred_nm = ingred_nm,
                     ingred_nm_k = ingred_nm_k,
-                    parent_ingred_nm = parent_ingred_nm,
+                    # parent_ingred_nm = parent_ingred_nm,
                     buy_unit_cd = buy_unit_cd,
                     sales_area_type = sales_area_type,
                     owner_user_id = self.owner_user_id,
@@ -110,7 +110,7 @@ class IngredCrud(BaseService):
             edit_ingred = self.db.query(Ingred).filter(Ingred.ingred_id == ingred_id, Ingred.owner_user_id == self.user_id).one()
             edit_ingred.ingred_nm = ingred_nm
             edit_ingred.ingred_nm_k = ingred_nm_k
-            edit_ingred.parent_ingred_nm = parent_ingred_nm
+            # edit_ingred.parent_ingred_nm = parent_ingred_nm
             edit_ingred.buy_unit_cd = buy_unit_cd
             edit_ingred.sales_area_type = sales_area_type
             edit_ingred.upd_timestamp = time_stamp
@@ -201,6 +201,7 @@ class IngredCrud(BaseService):
                 ingred_id = ingred_id,
                 conv_unit_cd = conv_unit_cd,
                 conv_rate = conv_rate,
+                owner_user_id = self.owner_user_id,
                 crt_timestamp = time_stamp,
                 upd_timestamp = time_stamp,
                 crt_user_id = self.user_id,
@@ -227,6 +228,7 @@ class IngredCrud(BaseService):
             edit_ingred_unit_conv.ingred_id = ingred_id
             edit_ingred_unit_conv.conv_unit_cd = conv_unit_cd
             edit_ingred_unit_conv.conv_rate = conv_rate
+            edit_ingred_unit_conv.owner_user_id = self.owner_user_id
             edit_ingred_unit_conv.upd_timestamp = time_stamp
             edit_ingred_unit_conv.upd_user_id = self.user_id
             edit_ingred_unit_conv.version = edit_ingred_unit_conv.version + 1

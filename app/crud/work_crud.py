@@ -223,7 +223,7 @@ class WorkCrud(BaseService):
                         owner_user_id = self.owner_user_id,
                         ingred_nm = recipe_ingred.rel_m_ingred.ingred_nm,
                         qty = recalc_qty,
-                        unit_cd = recipe_ingred.unit_cd,
+                        unit_cd = recipe_ingred.rel_m_ingred_unit_conv.conv_unit_cd,
                         sales_area_type = recipe_ingred.rel_m_ingred.sales_area_type,
                         sales_area_seq = const_sales_area_type.sort_seq,
                         manual_add_flg = "F",
@@ -261,8 +261,7 @@ class WorkCrud(BaseService):
                 LEFT JOIN m_ingred t3 
                     ON t2.ingred_id = t3.ingred_id 
                 LEFT JOIN m_ingred_unit_conv t4 
-                    ON t4.ingred_id = t2.ingred_id 
-                    AND t4.conv_unit_cd = t2.unit_cd 
+                    ON t4.ingred_unit_conv_id = t2.ingred_unit_conv_id 
                 LEFT JOIN c_app_const c0004
                     ON c0004.type_cd = 'C0004'
                     AND c0004.val = t3.sales_area_type
@@ -435,7 +434,7 @@ class WorkCrud(BaseService):
 
         try:
             ingred_crud = IngredCrud(self.user_id, self.group_id, self.owner_user_id, self.db)
-            ingred_unit_conv = ingred_crud.get_ingred_unit_conv_from_conv_unit_cd(recipe_ingred.ingred_id, recipe_ingred.unit_cd)
+            ingred_unit_conv = ingred_crud.get_ingred_unit_conv_from_conv_unit_cd(recipe_ingred.ingred_id, recipe_ingred.rel_m_ingred_unit_conv.conv_unit_cd)
             recalc_qty = recipe_ingred.qty / ingred_unit_conv.conv_rate
 
             return recalc_qty

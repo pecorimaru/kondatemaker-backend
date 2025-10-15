@@ -139,7 +139,7 @@ class UserCrud(BaseService):
         try:
             user_config = self.db.query(UserConfig).filter(
                 UserConfig.user_id == self.owner_user_id, 
-                UserConfig.config_type == const.USER_CONFIG_TYPE_2_TOWEEK_MENU_PLAN,
+                UserConfig.config_type == const.USER_CONFIG_TYPE_TOWEEK_MENU_PLAN,
             ).one_or_none()
 
             return user_config.val if user_config else None
@@ -156,7 +156,7 @@ class UserCrud(BaseService):
         try:         
             user_config = self.db \
                 .query(UserConfig) \
-                .filter(UserConfig.user_id == self.owner_user_id, UserConfig.config_type == const.USER_CONFIG_TYPE_2_TOWEEK_MENU_PLAN) \
+                .filter(UserConfig.user_id == self.owner_user_id, UserConfig.config_type == const.USER_CONFIG_TYPE_TOWEEK_MENU_PLAN) \
                 .one_or_none()
 
             if user_config:
@@ -169,7 +169,7 @@ class UserCrud(BaseService):
             else:
                 new_user_config = UserConfig(
                     user_id = self.owner_user_id,
-                    config_type = const.USER_CONFIG_TYPE_2_TOWEEK_MENU_PLAN,
+                    config_type = const.USER_CONFIG_TYPE_TOWEEK_MENU_PLAN,
                     config_val = selected_plan_id,
                     crt_timestamp = time_stamp,
                     crt_user_id = self.user_id,
@@ -201,7 +201,7 @@ class UserCrud(BaseService):
     def get_user_config_from_token(self, token: str) -> UserConfig:
 
         try:
-            user_config = self.db.query(UserConfig).filter(UserConfig.config_type == const.USER_CONFIG_TYPE_5_ACTIVATION_TOKEN, UserConfig.val == token).one_or_none()
+            user_config = self.db.query(UserConfig).filter(UserConfig.config_type == const.USER_CONFIG_TYPE_ACTIVATION_TOKEN, UserConfig.val == token).one_or_none()
             
             return user_config
 
@@ -217,6 +217,7 @@ class UserCrud(BaseService):
             new_user_config = UserConfig(
                 user_id = user_id,
                 config_type = config_type,
+                config_type_nm = get_user_config_type_nm(config_type),
                 val = val,
                 crt_timestamp = time_stamp,
                 crt_user_id = user_id,
@@ -276,4 +277,19 @@ class UserCrud(BaseService):
         except SQLAlchemyError as e:
             method_nm = self.get_method_nm()
             self.handle_system_error(e, method_nm, self.get_params(method_nm))
-            
+
+
+def get_user_config_type_nm(config_type: str) -> str:
+
+    if config_type == const.USER_CONFIG_TYPE_START_WEEKDAY:
+        return const.USER_CONFIG_TYPE_NM_START_WEEKDAY
+    elif config_type == const.USER_CONFIG_TYPE_TOWEEK_MENU_PLAN:
+        return const.USER_CONFIG_TYPE_NM_TOWEEK_MENU_PLAN
+    elif config_type == const.USER_CONFIG_TYPE_CURRENT_GROUP:
+        return const.USER_CONFIG_TYPE_NM_CURRENT_GROUP
+    elif config_type == const.USER_CONFIG_TYPE_ACTIVATE_FLG:
+        return const.USER_CONFIG_TYPE_NM_ACTIVATE_FLG
+    elif config_type == const.USER_CONFIG_TYPE_ACTIVATION_TOKEN:
+        return const.USER_CONFIG_TYPE_NM_ACTIVATION_TOKEN
+    else:
+        return ""

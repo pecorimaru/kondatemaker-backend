@@ -11,6 +11,7 @@ from app.core.base import Base
 if TYPE_CHECKING:
     from app.models.Recipe import Recipe
     from app.models.Ingred import Ingred
+    from app.models.IngredUnitConv import IngredUnitConv
 
 
 class RecipeIngred(Base):
@@ -19,8 +20,9 @@ class RecipeIngred(Base):
     recipe_ingred_id = Column(Integer, primary_key=True, autoincrement=True)
     recipe_id = Column(Integer, ForeignKey('t_recipe.recipe_id'), nullable=False)
     ingred_id = Column(Integer, ForeignKey('m_ingred.ingred_id'), nullable=False)
+    ingred_unit_conv_id = Column(Integer, ForeignKey('m_ingred_unit_conv.ingred_unit_conv_id'), nullable=False)
     qty = Column(Numeric(8, 2), nullable=False)
-    unit_cd = Column(String(2), nullable=False)
+    # unit_cd = Column(String(2), nullable=False)
     crt_user_id = Column(Integer, ForeignKey("m_user.user_id"), nullable=False)
     crt_timestamp = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
     upd_user_id = Column(Integer, ForeignKey("m_user.user_id"), nullable=False)
@@ -33,3 +35,4 @@ class RecipeIngred(Base):
 
     rel_t_recipe: Mapped[Recipe] = relationship("Recipe", back_populates="rel_t_recipe_ingred")
     rel_m_ingred: Mapped[Ingred] = relationship("Ingred", back_populates="rel_t_recipe_ingred")
+    rel_m_ingred_unit_conv: Mapped[IngredUnitConv] = relationship("IngredUnitConv", back_populates="rel_t_recipe_ingred")

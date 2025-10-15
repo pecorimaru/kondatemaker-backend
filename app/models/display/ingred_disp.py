@@ -7,7 +7,7 @@ class IngredDisp(CamelModel):
     ingred_id: int
     ingred_nm: str
     ingred_nm_k: Optional[str]=None
-    parent_ingred_nm: str
+    parent_ingred_nm: Optional[str]=None
     buy_unit_cd: str
     sales_area_type: str
     unit_conv_weight: Optional[int]=None
@@ -18,7 +18,7 @@ class IngredDisp(CamelModel):
             ingred_id = ingred.ingred_id, 
             ingred_nm = ingred.ingred_nm,
             ingred_nm_k = ingred.ingred_nm_k,
-            parent_ingred_nm = ingred.parent_ingred_nm,
+            parent_ingred_nm = ingred.parent.ingred_nm if ingred.parent else None,
             buy_unit_cd = ingred.buy_unit_cd,
             sales_area_type = ingred.sales_area_type,
         )

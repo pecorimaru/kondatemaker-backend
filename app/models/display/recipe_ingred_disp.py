@@ -19,6 +19,6 @@ class RecipeIngredDisp(CamelModel):
             recipe_id = recipe_ingred.recipe_id,
             ingred_nm = recipe_ingred.rel_m_ingred.ingred_nm,
             qty = recipe_ingred.qty,
-            unit_cd = recipe_ingred.unit_cd,
+            unit_cd = recipe_ingred.rel_m_ingred_unit_conv.conv_unit_cd,
             sales_area_type = recipe_ingred.rel_m_ingred.sales_area_type,
         )

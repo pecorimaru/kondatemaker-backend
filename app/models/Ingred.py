@@ -21,7 +21,7 @@ class Ingred(Base):
     ingred_id = Column(Integer, primary_key=True, autoincrement=True)
     ingred_nm = Column(String(80), nullable=False)
     ingred_nm_k = Column(String(160))
-    parent_ingred_nm = Column(String(80), nullable=False)
+    parent_ingred_id = Column(Integer, ForeignKey('m_ingred.ingred_id'), nullable=False)
     buy_unit_cd = Column(String(2), nullable=False)
     sales_area_type = Column(String(2), nullable=False)
     owner_user_id = Column(Integer, ForeignKey('m_user.user_id'), nullable=False)
@@ -38,4 +38,5 @@ class Ingred(Base):
     rel_m_user: Mapped[User] = relationship("User", foreign_keys=[owner_user_id], back_populates="rel_m_ingred")
     rel_m_ingred_unit_conv: Mapped[list[IngredUnitConv]] = relationship("IngredUnitConv", back_populates="rel_m_ingred")
     rel_t_recipe_ingred: Mapped[list[RecipeIngred]] = relationship("RecipeIngred", back_populates="rel_m_ingred")
-    
+    parent: Mapped[Ingred] = relationship("Ingred", foreign_keys=[parent_ingred_id], remote_side=[ingred_id], back_populates="children")
+    children: Mapped[list[Ingred]] = relationship("Ingred", back_populates="parent")
