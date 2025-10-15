@@ -6,10 +6,12 @@ from sqlalchemy.orm import Mapped
 from typing import TYPE_CHECKING
 
 from app.core.base import Base
+from app.models.RecipeIngred import RecipeIngred
 
 if TYPE_CHECKING:
     from app.models.Ingred import Ingred
     from app.models.User import User
+
 
 
 class IngredUnitConv(Base):
@@ -19,6 +21,7 @@ class IngredUnitConv(Base):
     ingred_id = Column(Integer, ForeignKey('m_ingred.ingred_id'), nullable=False)
     conv_unit_cd = Column(String(2), nullable=False)
     conv_rate = Column(Numeric(8, 4), nullable=False)
+    owner_user_id = Column(Integer, ForeignKey("m_user.user_id"), nullable=False)
     crt_user_id = Column(Integer, ForeignKey("m_user.user_id"), nullable=False)
     crt_timestamp = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
     upd_user_id = Column(Integer, ForeignKey("m_user.user_id"), nullable=False)
@@ -30,4 +33,5 @@ class IngredUnitConv(Base):
     )
 
     rel_m_ingred: Mapped[Ingred] = relationship("Ingred", back_populates="rel_m_ingred_unit_conv")
-
+    rel_m_user: Mapped[User] = relationship("User", foreign_keys=[owner_user_id], back_populates="rel_m_ingred_unit_conv")
+    rel_t_recipe_ingred: Mapped[list[RecipeIngred]] = relationship("RecipeIngred", back_populates="rel_m_ingred_unit_conv")

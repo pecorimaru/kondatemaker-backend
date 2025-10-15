@@ -34,7 +34,7 @@ class LoginService(BaseService):
             user_validators.ensure_not_deleted(user)
 
             # ユーザーがアクティブであることを確認
-            user_config = user_crud.get_user_config(user.user_id, const.USER_CONFIG_TYPE_4_ACTIVATE_FLG)
+            user_config = user_crud.get_user_config(user.user_id, const.USER_CONFIG_TYPE_ACTIVATE_FLG)
             user_validators.ensure_activate(user_config)
 
             current_group = self.get_current_group(user.user_id)
@@ -64,10 +64,10 @@ class LoginService(BaseService):
                     is_active_account = True
                     
                     # 新規登録済でアクティベート待ちの場合
-                    user_config = user_crud.get_user_config(user.user_id, const.USER_CONFIG_TYPE_4_ACTIVATE_FLG)
+                    user_config = user_crud.get_user_config(user.user_id, const.USER_CONFIG_TYPE_ACTIVATE_FLG)
                     if user_config.val == "F":
-                        user_crud.update_user_config(user.user_id, const.USER_CONFIG_TYPE_4_ACTIVATE_FLG, "T")
-                        user_crud.delete_user_config(user.user_id, const.USER_CONFIG_TYPE_5_ACTIVATION_TOKEN)
+                        user_crud.update_user_config(user.user_id, const.USER_CONFIG_TYPE_ACTIVATE_FLG, "T")
+                        user_crud.delete_user_config(user.user_id, const.USER_CONFIG_TYPE_ACTIVATION_TOKEN)
                         self.db.commit()
 
                 else:
@@ -86,7 +86,7 @@ class LoginService(BaseService):
 
                 # ユーザー設定登録・更新・削除
                 self.user_config_initialize(new_user.user_id, group.group_id)
-                user_crud.create_user_config(new_user.user_id, const.USER_CONFIG_TYPE_4_ACTIVATE_FLG, "T")
+                user_crud.create_user_config(new_user.user_id, const.USER_CONFIG_TYPE_ACTIVATE_FLG, "T")
 
                 # adminユーザーが所有している食材を登録
                 self.create_default_ingred(new_user.user_id)
@@ -142,7 +142,7 @@ class LoginService(BaseService):
             user_validators.ensure_not_deleted(user)
 
             # アクティベーションの確認
-            user_config = user_crud.get_user_config(user.user_id, const.USER_CONFIG_TYPE_4_ACTIVATE_FLG)
+            user_config = user_crud.get_user_config(user.user_id, const.USER_CONFIG_TYPE_ACTIVATE_FLG)
             user_validators.ensure_activate(user_config)
 
             new_password = api_utils.generate_temporary_password()
@@ -188,8 +188,8 @@ class LoginService(BaseService):
             token = api_utils.generate_activation_token()
 
             # ユーザー設定登録
-            user_crud.create_user_config(new_user.user_id, const.USER_CONFIG_TYPE_4_ACTIVATE_FLG, "F")
-            user_crud.create_user_config(new_user.user_id, const.USER_CONFIG_TYPE_5_ACTIVATION_TOKEN, token)
+            user_crud.create_user_config(new_user.user_id, const.USER_CONFIG_TYPE_ACTIVATE_FLG, "F")
+            user_crud.create_user_config(new_user.user_id, const.USER_CONFIG_TYPE_ACTIVATION_TOKEN, token)
 
             self.db.commit()
 
@@ -259,7 +259,7 @@ class LoginService(BaseService):
 
         try:
             user_crud = UserCrud(None, None, None, self.db)
-            user_config = user_crud.get_user_config(user_id, const.USER_CONFIG_TYPE_3_CURRENT_GROUP)
+            user_config = user_crud.get_user_config(user_id, const.USER_CONFIG_TYPE_CURRENT_GROUP)
 
             group_crud = GroupCrud(None, None, None, self.db)
             group = group_crud.get_group(int(user_config.val))
@@ -283,7 +283,7 @@ class LoginService(BaseService):
             return
 
         # グループ設定（1:参加フラグ）登録
-        group_crud.create_group_config(group.group_id, user.user_id, const.GROUP_CONFIG_TYPE_1_JOIN_FLG, "T")
+        group_crud.create_group_config(group.group_id, user.user_id, const.GROUP_CONFIG_TYPE_JOIN_FLG, "T")
 
         return group
 
@@ -292,10 +292,10 @@ class LoginService(BaseService):
     
         # ユーザー設定登録・更新・削除
         user_crud = UserCrud(user_id, group_id, user_id, self.db)
-        user_crud.create_user_config(user_id, const.USER_CONFIG_TYPE_1_START_WEEKDAY, "2")
-        user_crud.create_user_config(user_id, const.USER_CONFIG_TYPE_3_CURRENT_GROUP, str(group_id))
-        user_crud.update_user_config(user_id, const.USER_CONFIG_TYPE_4_ACTIVATE_FLG, "T")
-        user_crud.delete_user_config(user_id, const.USER_CONFIG_TYPE_5_ACTIVATION_TOKEN)
+        user_crud.create_user_config(user_id, const.USER_CONFIG_TYPE_START_WEEKDAY, "2")
+        user_crud.create_user_config(user_id, const.USER_CONFIG_TYPE_CURRENT_GROUP, str(group_id))
+        user_crud.update_user_config(user_id, const.USER_CONFIG_TYPE_ACTIVATE_FLG, "T")
+        user_crud.delete_user_config(user_id, const.USER_CONFIG_TYPE_ACTIVATION_TOKEN)
 
         return
 
@@ -338,8 +338,8 @@ class LoginService(BaseService):
         # アクティベーショントークン発行から30分以上経過した場合
         if (user_config.crt_timestamp + timedelta(seconds=30 * 60)).timestamp() <= datetime.now().timestamp():
        
-            user_crud.delete_user_config(user_config.user_id, const.USER_CONFIG_TYPE_4_ACTIVATE_FLG)
-            user_crud.delete_user_config(user_config.user_id, const.USER_CONFIG_TYPE_5_ACTIVATION_TOKEN)
+            user_crud.delete_user_config(user_config.user_id, const.USER_CONFIG_TYPE_ACTIVATE_FLG)
+            user_crud.delete_user_config(user_config.user_id, const.USER_CONFIG_TYPE_ACTIVATION_TOKEN)
             user_crud.delete_user(user_config.user_id)
             self.db.commit()
 

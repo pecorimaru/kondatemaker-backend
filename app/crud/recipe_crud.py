@@ -195,7 +195,7 @@ class RecipeCrud(BaseService):
             self.handle_system_error(e, method_nm, self.get_params(method_nm))
 
 
-    def create_recipe_ingred(self, recipe_id: int, ingred_id: int, qty: float, unit_cd: str) -> RecipeIngred:
+    def create_recipe_ingred(self, recipe_id: int, ingred_id: int, qty: float, ingred_unit_conv_id: int) -> RecipeIngred:
 
         time_stamp = db_utils.get_timestamp()
 
@@ -203,8 +203,8 @@ class RecipeCrud(BaseService):
             new_recipe_ingred = RecipeIngred(
                 recipe_id = recipe_id,
                 ingred_id = ingred_id,
+                ingred_unit_conv_id = ingred_unit_conv_id,
                 qty = qty,
-                unit_cd = unit_cd,
                 crt_timestamp = time_stamp,
                 upd_timestamp = time_stamp,
                 crt_user_id = self.user_id,
@@ -223,15 +223,15 @@ class RecipeCrud(BaseService):
             self.handle_system_error(e, method_nm, self.get_params(method_nm))
 
 
-    def update_recipe_ingred(self, recipe_ingred_id: int, ingred_id: int, qty: float, unit_cd: str) -> RecipeIngred:
+    def update_recipe_ingred(self, recipe_ingred_id: int, ingred_id: int, qty: float, ingred_unit_conv_id: int) -> RecipeIngred:
 
         time_stamp = db_utils.get_timestamp()
 
         try:
             edit_recipe_ingred = self.db.query(RecipeIngred).filter(RecipeIngred.recipe_ingred_id == recipe_ingred_id).one()
             edit_recipe_ingred.ingred_id = ingred_id
+            edit_recipe_ingred.ingred_unit_conv_id = ingred_unit_conv_id
             edit_recipe_ingred.qty = qty
-            edit_recipe_ingred.unit_cd = unit_cd
             edit_recipe_ingred.upd_timestamp = time_stamp
             edit_recipe_ingred.upd_user_id = self.user_id
             edit_recipe_ingred.version = edit_recipe_ingred.version + 1

@@ -15,6 +15,7 @@ from app.models.MenuPlan import MenuPlan
 from app.models.Ingred import Ingred
 from app.models.BuyIngred import BuyIngred
 from app.models.ToweekMenuPlanDet import ToweekMenuPlanDet
+from app.models.IngredUnitConv import IngredUnitConv
 
 
 class User(Base):
@@ -37,6 +38,6 @@ class User(Base):
     rel_t_recipe: Mapped[list[Recipe]] = relationship("Recipe", foreign_keys="Recipe.owner_user_id", back_populates="rel_m_user")
     rel_t_menu_plan: Mapped[list[MenuPlan]] = relationship("MenuPlan", foreign_keys="MenuPlan.owner_user_id", back_populates="rel_m_user")
     rel_m_ingred: Mapped[list[Ingred]] = relationship("Ingred", foreign_keys="Ingred.owner_user_id", back_populates="rel_m_user")
-    # rel_m_ingred_unit_conv: Mapped[list[IngredUnitConv]] = relationship("IngredUnitConv", back_populates="rel_m_user")
+    rel_m_ingred_unit_conv: Mapped[list[IngredUnitConv]] = relationship("IngredUnitConv", foreign_keys="IngredUnitConv.owner_user_id", back_populates="rel_m_user")
     rel_w_buy_ingred: Mapped[list[BuyIngred]] = relationship("BuyIngred", foreign_keys="BuyIngred.owner_user_id", back_populates="rel_m_user")
     rel_w_toweek_menu_plan_det: Mapped[list[ToweekMenuPlanDet]] = relationship("ToweekMenuPlanDet", foreign_keys="ToweekMenuPlanDet.owner_user_id", back_populates="rel_m_user")

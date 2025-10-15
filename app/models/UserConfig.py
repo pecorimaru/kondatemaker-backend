@@ -17,6 +17,7 @@ class UserConfig(Base):
     user_config_id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('m_user.user_id'), nullable=False)
     config_type = Column(String(2), nullable=False)
+    config_type_nm = Column(String(80), nullable=False)
     val = Column(String(2))
     crt_user_id = Column(Integer, ForeignKey("m_user.user_id"), nullable=False)
     crt_timestamp = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))

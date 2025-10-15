@@ -224,7 +224,7 @@ class SettingService(BaseService):
                 )
 
             group_crud = GroupCrud(self.user_id, self.group_id, self.owner_user_id, self.db)  
-            group_config = group_crud.get_group_config(self.group_id, invite_user.user_id, const.GROUP_CONFIG_TYPE_1_JOIN_FLG)
+            group_config = group_crud.get_group_config(self.group_id, invite_user.user_id, const.GROUP_CONFIG_TYPE_JOIN_FLG)
 
             if group_config:
                 # 既に参加済の場合
@@ -235,13 +235,13 @@ class SettingService(BaseService):
                     )
                 
                 # 未参加（招待済）の場合、前回招待時の発行URLを無効化
-                group_crud.delete_group_config(self.group_id, invite_user.user_id, const.GROUP_CONFIG_TYPE_5_INVITE_TOKEN)
+                group_crud.delete_group_config(self.group_id, invite_user.user_id, const.GROUP_CONFIG_TYPE_INVITE_TOKEN)
 
             else:
-                group_crud.create_group_config(self.group_id, invite_user.user_id, const.GROUP_CONFIG_TYPE_1_JOIN_FLG, "F")
+                group_crud.create_group_config(self.group_id, invite_user.user_id, const.GROUP_CONFIG_TYPE_JOIN_FLG, "F")
 
             token = api_utils.generate_activation_token()
-            group_crud.create_group_config(self.group_id, invite_user.user_id, const.GROUP_CONFIG_TYPE_5_INVITE_TOKEN, token)
+            group_crud.create_group_config(self.group_id, invite_user.user_id, const.GROUP_CONFIG_TYPE_INVITE_TOKEN, token)
 
             self.db.commit()
 
@@ -294,8 +294,8 @@ class SettingService(BaseService):
             user = user_crud.get_user()
             group_crud.user_id = user.user_id
 
-            group_crud.update_group_config(group_config.group_id, user.user_id, const.GROUP_CONFIG_TYPE_1_JOIN_FLG, "T")
-            group_crud.delete_group_config(group_config.group_id, user.user_id, const.GROUP_CONFIG_TYPE_5_INVITE_TOKEN)
+            group_crud.update_group_config(group_config.group_id, user.user_id, const.GROUP_CONFIG_TYPE_JOIN_FLG, "T")
+            group_crud.delete_group_config(group_config.group_id, user.user_id, const.GROUP_CONFIG_TYPE_INVITE_TOKEN)
 
             self.db.commit()
 
@@ -319,7 +319,7 @@ class SettingService(BaseService):
         # グループ招待トークン発行から30分以上経過した場合
         if (group_config.crt_timestamp + timedelta(seconds=30 * 60)).timestamp() <= datetime.now().timestamp():
 
-            group_crud.delete_group_config(group_config.group_id, group_config.user_id, const.GROUP_CONFIG_TYPE_5_INVITE_TOKEN)
+            group_crud.delete_group_config(group_config.group_id, group_config.user_id, const.GROUP_CONFIG_TYPE_INVITE_TOKEN)
             self.db.commit()
 
             raise HTTPException(
@@ -333,7 +333,7 @@ class SettingService(BaseService):
         try:
             # ユーザー設定（現在のグループ）を更新
             user_crud = UserCrud(self.user_id, self.group_id, self.owner_user_id, self.db)
-            user_crud.update_user_config(self.user_id, const.USER_CONFIG_TYPE_3_CURRENT_GROUP, str(group_id))
+            user_crud.update_user_config(self.user_id, const.USER_CONFIG_TYPE_CURRENT_GROUP, str(group_id))
 
             group_crud = GroupCrud(self.user_id, self.group_id, self.owner_user_id, self.db)
             group = group_crud.get_group(group_id)
@@ -355,13 +355,13 @@ class SettingService(BaseService):
         try:
             # ユーザー登録
             group_crud = GroupCrud(self.user_id, self.group_id, self.owner_user_id, self.db)
-            group_crud.delete_group_config(self.group_id, self.user_id, const.GROUP_CONFIG_TYPE_1_JOIN_FLG) 
+            group_crud.delete_group_config(self.group_id, self.user_id, const.GROUP_CONFIG_TYPE_JOIN_FLG) 
 
             # 自身が所有者となるグループを取得して現在のグループに指定    
             group_list = group_crud.get_group_list_from_owner_user_id(self.user_id)
             self_group_id = group_list[0].group_id
             user_crud = UserCrud(self.user_id, self.group_id, self.owner_user_id, self.db)
-            user_crud.update_user_config(self.user_id, const.USER_CONFIG_TYPE_3_CURRENT_GROUP, str(self_group_id))
+            user_crud.update_user_config(self.user_id, const.USER_CONFIG_TYPE_CURRENT_GROUP, str(self_group_id))
 
             self.db.commit()
 
