@@ -361,6 +361,19 @@ class WorkCrud(BaseService):
             self.handle_system_error(e, method_nm, self.get_params(method_nm))
 
 
+    def delete_buy_ingred_all(self):
+
+        try:
+            self.db.query(BuyIngred).filter(BuyIngred.owner_user_id == self.owner_user_id).delete()
+
+            return
+
+        except SQLAlchemyError as e:
+            self.db.rollback()
+            method_nm = self.get_method_nm()
+            self.handle_system_error(e, method_nm, self.get_params(method_nm))
+
+
     def delete_buy_ingred_other_than_fix_buy(self):
 
         try:
