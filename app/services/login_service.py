@@ -1,7 +1,8 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-from google.oauth2 import id_token
-from google.auth.transport import requests
+# from google.oauth2 import id_token
+# from google.auth.transport import requests
+import requests
 
 import os
 from datetime import datetime, timedelta
@@ -47,9 +48,23 @@ class LoginService(BaseService):
             self.handle_system_error(e, method_nm, self.get_params(method_nm))
 
 
-    def google_login(self, email: str) -> TokenData:
+    def google_login(self, google_token: str) -> TokenData:
 
         try:
+
+            userinfo_response = requests.get(
+                'https://www.googleapis.com/oauth2/v2/userinfo',
+                headers={'Authorization': f'Bearer {google_token}'}
+            )
+            
+            if userinfo_response.status_code != 200:
+                raise Exception("Google token validation failed")
+                
+            userinfo_data = userinfo_response.json()
+            email = userinfo_data.get('email')
+            
+            if not email:
+                raise Exception("Email not found in Google user info")
 
             is_active_account = False
 

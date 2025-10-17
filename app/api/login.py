@@ -7,6 +7,7 @@ from app.services import LoginService
 from app.utils import message_utils as msg
 from app.types.api.login import (
     LoginRequest,
+    GoogleLoginRequest,
     LoginResponse,
     VerifyRequest,
     VerifyResponse,
@@ -46,11 +47,11 @@ def login(request: LoginRequest, response: Response, db: Session = Depends(get_d
 
 
 @router.post("/googleLogin", response_model=LoginResponse)
-def google_login(request: LoginRequest, response: Response, db: Session = Depends(get_db)):
+def google_login(request: GoogleLoginRequest, response: Response, db: Session = Depends(get_db)):
 
     # Google のトークンを検証
     login_service = LoginService(None, None, None, db)
-    token_data = login_service.google_login(request.email)
+    token_data = login_service.google_login(request.google_token)
 
     # クッキーにリフレッシュトークンをセット
     response.set_cookie(

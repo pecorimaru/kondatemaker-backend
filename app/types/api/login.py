@@ -8,6 +8,10 @@ class LoginRequest(CamelModel):
     password: Optional[str] = None
 
 
+class GoogleLoginRequest(CamelModel):
+    google_token: str
+
+
 class LoginResponse(CamelModel):
     status_code: int
     message: str
