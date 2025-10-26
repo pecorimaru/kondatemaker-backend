@@ -22,7 +22,7 @@ class SettingService(BaseService):
             user_crud = UserCrud(self.user_id, self.group_id, self.owner_user_id, self.db)
             user = user_crud.get_user()
 
-            user_disp = UserDisp(user_nm = user.user_nm)
+            user_disp = UserDisp(user_nm = user.user_nm, email_addr=user.email_addr)
 
             return user_disp
 
