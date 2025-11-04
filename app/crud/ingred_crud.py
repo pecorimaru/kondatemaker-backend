@@ -73,7 +73,7 @@ class IngredCrud(BaseService):
             self.handle_system_error(e, method_nm, self.get_params(method_nm))
 
 
-    def create_ingred(self, ingred_nm: str, ingred_nm_k: str, parent_ingred_nm: str, buy_unit_cd: str, sales_area_type: str) -> Ingred:
+    def create_ingred(self, ingred_nm: str, ingred_nm_k: str, buy_unit_cd: str, sales_area_type: str) -> Ingred:
 
             time_stamp = db_utils.get_timestamp()
 
@@ -102,7 +102,7 @@ class IngredCrud(BaseService):
                 self.handle_system_error(e, method_nm, self.get_params(method_nm))
 
 
-    def update_ingred(self, ingred_id: int, ingred_nm: str, ingred_nm_k: str, parent_ingred_nm: str, buy_unit_cd: str, sales_area_type: str):
+    def update_ingred(self, ingred_id: int, ingred_nm: str, ingred_nm_k: str, buy_unit_cd: str, sales_area_type: str):
 
         time_stamp = db_utils.get_timestamp()
 

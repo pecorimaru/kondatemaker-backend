@@ -32,7 +32,7 @@ class IngredService(BaseService):
             self.handle_system_error(e, method_nm, self.get_params(method_nm))
 
 
-    def add_ingred(self, ingred_nm: str, ingred_nm_k: str, parent_ingred_nm: str, buy_unit_cd: str, sales_area_type: str) -> IngredDisp:
+    def add_ingred(self, ingred_nm: str, ingred_nm_k: str, buy_unit_cd: str, sales_area_type: str) -> IngredDisp:
 
         try:
             ingred_crud = IngredCrud(self.user_id, self.group_id, self.owner_user_id, self.db)
@@ -41,7 +41,7 @@ class IngredService(BaseService):
             ingred = ingred_crud.get_ingred_from_nm(ingred_nm)
             ingred_validators.check_ingred_unique(ingred)
 
-            new_ingred = ingred_crud.create_ingred(ingred_nm, ingred_nm_k, parent_ingred_nm, buy_unit_cd, sales_area_type)
+            new_ingred = ingred_crud.create_ingred(ingred_nm, ingred_nm_k, buy_unit_cd, sales_area_type)
             
             # 購入単位に対する単位変換情報（1 : 1）を登録
             ingred_crud.create_ingred_unit_conv(new_ingred.ingred_id, new_ingred.buy_unit_cd, 1)
@@ -54,7 +54,7 @@ class IngredService(BaseService):
             self.handle_system_error(e, method_nm, self.get_params(method_nm))
 
 
-    def edit_ingred(self, ingred_id: int, ingred_nm: str, ingred_nm_k: str, parent_ingred_nm: str, buy_unit_cd: str, sales_area_type: str) -> IngredDisp:
+    def edit_ingred(self, ingred_id: int, ingred_nm: str, ingred_nm_k: str, buy_unit_cd: str, sales_area_type: str) -> IngredDisp:
 
         try:
             ingred_crud = IngredCrud(self.user_id, self.group_id, self.owner_user_id, self.db)
@@ -66,7 +66,7 @@ class IngredService(BaseService):
                 ingred_validators.check_ingred_unique(ingred)
 
             old_buy_unit_cd = old_ingred.buy_unit_cd
-            edit_ingred = ingred_crud.update_ingred(ingred_id, ingred_nm, ingred_nm_k, parent_ingred_nm, buy_unit_cd, sales_area_type)
+            edit_ingred = ingred_crud.update_ingred(ingred_id, ingred_nm, ingred_nm_k, buy_unit_cd, sales_area_type)
 
             # 購入単位が変更された場合は食材単位変換も更新
             if old_buy_unit_cd != edit_ingred.buy_unit_cd:
