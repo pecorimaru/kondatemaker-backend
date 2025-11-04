@@ -16,6 +16,7 @@ from app.validators.item import (
     # 参照整合性チェック系
     check_recipe_unreferenced,
     check_ingred_unreferenced,
+    check_ingred_unit_conv_unreferenced,
     
     # ビジネスルール系
     check_weekday_cd,
@@ -43,6 +44,7 @@ class IngredValidators:
     check_ingred_unique = staticmethod(check_ingred_unique)
     check_ingred_unreferenced = staticmethod(check_ingred_unreferenced)
     check_ingred_unit_conv_unique = staticmethod(check_ingred_unit_conv_unique)
+    check_ingred_unit_conv_unreferenced = staticmethod(check_ingred_unit_conv_unreferenced)
 
 class UserValidators:
     verify_password = staticmethod(verify_password)

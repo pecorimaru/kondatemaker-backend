@@ -4,8 +4,9 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.core.base_service import BaseService
 from app.models import Ingred, IngredUnitConv
-
+from app.crud.app_const_crud import AppConstCrud
 from app.utils import db_utils
+from app.validators import ingred_validators
 
 
 class IngredCrud(BaseService):
@@ -292,6 +293,9 @@ class IngredCrud(BaseService):
 
             # 購入単位(新)が変換単位として登録されていない場合
             else:
+
+                app_const_crud = AppConstCrud(self.db)
+                ingred_validators.check_ingred_unit_conv_unreferenced(old_standard_ingred_unit_conv.rel_t_recipe_ingred, app_const_crud)
 
                 # 購入単位(旧)の変換情報は削除
                 self.db.query(IngredUnitConv).filter(
