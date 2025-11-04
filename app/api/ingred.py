@@ -35,7 +35,7 @@ def submit_add_ingred(request: SubmitAddIngredRequest, db: Session = Depends(get
     login_info = decode_token(token)
 
     ingred_service = IngredService(login_info.user_id, login_info.group_id, login_info.owner_user_id, db)
-    new_ingred = ingred_service.add_ingred(request.ingred_nm, request.ingred_nm_k, request.parent_ingred_nm, request.buy_unit_cd, request.sales_area_type)
+    new_ingred = ingred_service.add_ingred(request.ingred_nm, request.ingred_nm_k, request.buy_unit_cd, request.sales_area_type)
     return SubmitAddIngredResponse(
         status_code = status.HTTP_200_OK,
         message = msg.get_message(msg.MI0002_CREATE_SUCCESSFUL),
@@ -48,7 +48,7 @@ def submit_edit_ingred(request: SubmitEditIngredRequest, db: Session = Depends(g
     login_info = decode_token(token)
 
     ingred_service = IngredService(login_info.user_id, login_info.group_id, login_info.owner_user_id, db)
-    edit_ingred = ingred_service.edit_ingred(request.ingred_id, request.ingred_nm, request.ingred_nm_k, request.parent_ingred_nm, request.buy_unit_cd, request.sales_area_type)
+    edit_ingred = ingred_service.edit_ingred(request.ingred_id, request.ingred_nm, request.ingred_nm_k, request.buy_unit_cd, request.sales_area_type)
     return SubmitEditIngredResponse(
         status_code = status.HTTP_200_OK,
         message = msg.get_message(msg.MI0003_EDIT_SUCCESSFUL),

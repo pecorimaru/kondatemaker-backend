@@ -7,7 +7,7 @@ from app.models.display import IngredDisp, IngredUnitConvDisp
 class SubmitAddIngredRequest(CamelModel):
     ingred_nm: str
     ingred_nm_k: Optional[str] = None
-    parent_ingred_nm: str
+    # parent_ingred_nm: str
     buy_unit_cd: str
     sales_area_type: Optional[str] = None
 
@@ -22,7 +22,7 @@ class SubmitEditIngredRequest(CamelModel):
     ingred_id: int
     ingred_nm: str
     ingred_nm_k: Optional[str] = None
-    parent_ingred_nm: str
+    # parent_ingred_nm: str
     buy_unit_cd: str
     sales_area_type: Optional[str] = None
 
