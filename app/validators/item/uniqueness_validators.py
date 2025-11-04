@@ -1,6 +1,6 @@
 from fastapi import HTTPException, status
 from app.models import MenuPlan, Recipe, Ingred, RecipeIngred, IngredUnitConv
-from app.crud import AppConstCrud
+from app.crud.app_const_crud import AppConstCrud
 from app.utils import constants as const, message_utils as msg
 
 

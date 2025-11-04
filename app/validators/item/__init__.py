@@ -18,7 +18,8 @@ from .uniqueness_validators import (
 # 参照整合性チェック系
 from .reference_validators import (
     check_recipe_unreferenced,
-    check_ingred_unreferenced
+    check_ingred_unreferenced,
+    check_ingred_unit_conv_unreferenced
 )
 
 # ビジネスルール系
