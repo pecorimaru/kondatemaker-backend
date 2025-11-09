@@ -27,3 +27,8 @@ GROUP_CONFIG_TYPE_NM_INVITE_TOKEN = "招待トークン"
 ADMIN_USER_ID = 8
 
 EMPTY_CD = "0"
+
+TEST_USER_EMAILS = frozenset([
+    "test@kondatemaker.invalid",
+    "kondatemaker@test",
+])

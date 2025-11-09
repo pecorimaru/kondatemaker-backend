@@ -55,3 +55,11 @@ def ensure_alive_token(user: User):
             status_code=status.HTTP_403_FORBIDDEN, 
             detail=msg.get_message(msg.ME0003_SESSION_TIME_OUT)
         ) 
+
+def ensure_not_test_account(email_addr: str):
+    """テストユーザーでないことを確認"""
+    if email_addr in const.TEST_USER_EMAILS:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, 
+            detail=msg.get_message(msg.ME0017_NOT_TEST_ACCOUNT)
+        ) 
