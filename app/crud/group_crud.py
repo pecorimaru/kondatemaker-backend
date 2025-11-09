@@ -138,7 +138,7 @@ class GroupCrud(BaseService):
         try:
             group_config_list = self.db.query(GroupConfig).filter(
                 GroupConfig.user_id == self.user_id, 
-                GroupConfig.config_type == const.GROUP_CONFIG_TYPE_1_JOIN_FLG,
+                GroupConfig.config_type == const.GROUP_CONFIG_TYPE_JOIN_FLG,
                 GroupConfig.val == "T",
             ).all()
             
@@ -154,7 +154,7 @@ class GroupCrud(BaseService):
         try:
             group_config_list = self.db.query(GroupConfig).filter(
                 GroupConfig.group_id == self.group_id, 
-                GroupConfig.config_type == const.GROUP_CONFIG_TYPE_1_JOIN_FLG,
+                GroupConfig.config_type == const.GROUP_CONFIG_TYPE_JOIN_FLG,
                 GroupConfig.val == "T",
             ).all()
             
