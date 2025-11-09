@@ -10,6 +10,7 @@ from app.models.display import UserDisp, GroupDisp, GroupMemberDisp
 from app.models import GroupConfig
 from app.utils import api_utils, mail_utils, message_utils as msg, constants as const
 from app.utils.api_utils import TokenData
+from app.validators import user_validators
 
 class SettingService(BaseService):
     def __init__(self, user_id: int, group_id: int, owner_user_id: int, db: Session):
@@ -51,6 +52,7 @@ class SettingService(BaseService):
         try:
             user_crud = UserCrud(self.user_id, self.group_id, self.owner_user_id, self.db)
             user = user_crud.get_user()
+            user_validators.ensure_not_test_account(user.email_addr)
 
             if not api_utils.verify_password(current_password, user.password):
                 raise HTTPException(
@@ -71,6 +73,12 @@ class SettingService(BaseService):
     def delete_user(self):
 
         try:
+            
+            user_crud = UserCrud(self.user_id, self.group_id, self.owner_user_id, self.db)
+            user = user_crud.get_user()
+            user_validators.ensure_not_test_account(user.email_addr)
+
+            # グループデータの削除
             group_crud = GroupCrud(self.user_id, self.group_id, self.owner_user_id, self.db)
             group_list = group_crud.get_group_list_from_owner_user_id(self.user_id)
 

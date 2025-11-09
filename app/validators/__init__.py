@@ -17,14 +17,15 @@ from app.validators.item import (
     check_recipe_unreferenced,
     check_ingred_unreferenced,
     check_ingred_unit_conv_unreferenced,
-    
+
     # ビジネスルール系
     check_weekday_cd,
     verify_password,
     ensure_not_deleted,
     ensure_deleted,
     ensure_activate,
-    ensure_alive_token
+    ensure_alive_token,
+    ensure_not_test_account
 )
 
 # 既存のコードとの互換性のために旧形式のモジュール構造をエミュレート
@@ -53,6 +54,7 @@ class UserValidators:
     ensure_activate = staticmethod(ensure_activate)
     ensure_alive_token = staticmethod(ensure_alive_token)
     exist_account = staticmethod(exist_account)
+    ensure_not_test_account = staticmethod(ensure_not_test_account)
 
 # 旧形式のインポートをサポート
 menu_plan_validators = MenuPlanValidators()

@@ -27,6 +27,10 @@ class LoginService(BaseService):
     def login(self, email: str, password: str) -> TokenData:
 
         try:
+
+            if email == "kondatemaker@test":
+                email = "test@kondatemaker.invalid"
+
             user_crud = UserCrud(None, None, None, self.db)
 
             # ユーザー情報の取得
@@ -151,6 +155,8 @@ class LoginService(BaseService):
     def reset_password(self, email: str):
 
         try:
+            user_validators.ensure_not_test_account(email)
+
             user_crud = UserCrud(None, None, None, self.db)
             user = user_crud.get_user_from_email(email)
             user_validators.exist_account(user)
